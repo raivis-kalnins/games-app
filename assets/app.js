@@ -1,0 +1,137 @@
+/* Games 63 v2.0.0. React controls only the portal UI; game engines keep their
+   own Canvas/DOM rendering outside React's reconciliation and frame loop. */
+import {LANGS, t as translate, normalizeLang} from './i18n.js';
+import {helpData} from './help.js';
+const React = window.React;
+const ReactDOM = window.ReactDOM;
+if (!React || !ReactDOM) throw new Error('Local React runtime did not load');
+const h = React.createElement;
+const VERSION = '2.1.0';
+const STORAGE='games63.prefs.v2'; // Retain earlier favourites, scores and language choices.
+const getPrefs=()=>{try{return JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch{return {}}};
+const savePrefs=v=>{try{localStorage.setItem(STORAGE,JSON.stringify(v))}catch{}};
+const getSoundPref=()=>{try{return localStorage.getItem('games63.sound.v2.1')==='on'}catch{return false}};
+const readHash=()=>{const m=location.hash.match(/^#game\/([a-z-]+)$/);return m?m[1]:null};
+const INFO=[
+ {id:'wolf',name:'Wolf & Eggs',lv:'Vilks ķer olas',ru:'Волк ловит яйца',cat:'arcade',art:'wolf',fresh:true,
+  desc:['The classic four-lane egg-catching challenge, reimagined with vector artwork.','Klasiskā četru olu celiņu spēle jaunā, glītā izskatā.','Классическая игра с четырьмя дорожками для ловли яиц.'],
+  rules:['Catch falling eggs using the four basket positions. Keys 1–4 or the on-screen controls. Choose game A or B.','Ķer olas četrās pozīcijās ar taustiņiem 1–4 vai ekrāna pogām. Izvēlies spēli A vai B.','Лови яйца в четырёх позициях клавишами 1–4 или кнопками на экране. Выбери игру A или B.']},
+ {id:'formula',name:'Formula Sprint',lv:'Formulas sacīkstes',ru:'Формула',cat:'racing',art:'formula',
+  desc:['High-speed lane changes, rival cars and an endless sprint to a new record.','Ātras joslu maiņas, konkurentu auto un sacīkstes par rekordu.','Быстрые перестроения, соперники и гонка за рекордом.'],
+  rules:['Avoid traffic. Tap left or right, or use the arrow keys.','Izvairies no automašīnām ar skārienu vai bulttaustiņiem.','Избегай машин касанием экрана или стрелками.']},
+ {id:'blocks',name:'Block Stack',lv:'Krītošie bloki',ru:'Падающие блоки',cat:'puzzle',art:'blocks',
+  desc:['Rotate and stack colourful falling blocks to clear lines.','Griez un kārto krāsainus blokus, lai aizpildītu līnijas.','Поворачивай и укладывай блоки, чтобы собирать линии.'],
+  rules:['Move left and right, rotate and drop shapes to clear rows.','Pārvieto, pagriez un nomet figūras, lai notīrītu rindas.','Двигай, вращай и сбрасывай фигуры, очищая ряды.']},
+ {id:'venice',name:'Venice Boats',lv:'Venēcijas laivas',ru:'Лодки Венеции',cat:'racing',art:'boats',
+  desc:['Navigate the colourful canals and collect stars on the water.','Izbrauc cauri Venēcijas kanāliem un savāc zvaigznes.','Плыви по каналам Венеции и собирай звёзды.'],
+  rules:['Steer your boat with arrows or touch. Avoid other boats and the canal banks.','Stūrē ar bultiņām vai pieskārienu; izvairies no šķēršļiem.','Управляй стрелками или касанием, избегая препятствий.']},
+ {id:'moto',name:'Moto Rider',lv:'Motociklu sacīkstes',ru:'Мотогонки',cat:'racing',art:'moto',
+  desc:['A nimble motorbike ride full of twists, obstacles and near misses.','Ātras motosacīkstes ar pagriezieniem un šķēršļiem.','Динамичная мотогонка с виражами и препятствиями.'],
+  rules:['Steer your motorbike to avoid obstacles and cover as much distance as possible.','Apbrauc šķēršļus un mēģini nobraukt pēc iespējas tālāk.','Объезжай препятствия и постарайся проехать как можно дальше.']},
+ {id:'snooker',name:'Mini Snooker',lv:'Biljards (snūkers)',ru:'Бильярд (снукер)',cat:'sports',art:'snooker',
+  desc:['Set the angle, choose power and pot the balls on the green table.','Mērķē, izvēlies sitiena spēku un iesit bumbas lūzās.','Целься, выбирай силу удара и забивай шары в лузы.'],
+  rules:['Aim on the table, drag to set power and release to shoot.','Mērķē uz galda; velc, lai izvēlētos spēku, un atlaid.','Прицеливайся, тяни для выбора силы удара и отпускай.']},
+ {id:'darts',name:'Darts 301',lv:'Šautriņas 301',ru:'Дартс 301',cat:'sports',art:'darts',
+  desc:['A sharp aim, a steady hand and three darts to get to zero.','Precizitātes spēle ar trim šautriņām katrā gājienā.','Точность и три дротика, чтобы дойти до нуля.'],
+  rules:['Aim and throw darts at the board, scoring your way down from 301.','Met šautriņas mērķī, lai samazinātu rezultātu no 301.','Попадай в мишень, уменьшая счёт с 301.']},
+ {id:'farm',name:'Farm City',lv:'Mana ferma',ru:'Моя ферма',cat:'strategy',art:'farm',
+  desc:['Grow crops, build up your farm and unlock a thriving little town.','Audzē ražu, būvē un attīsti savu fermu.','Выращивай урожай, строй и развивай свою ферму.'],
+  rules:['Choose a crop or building, plant on an empty tile and harvest when ready.','Izvēlies augus vai ēkas, stādi un novāc ražu.','Выбирай растения или здания, сажай и собирай урожай.']},
+ {id:'cards',name:'Durak Cards',lv:'Duraks',ru:'Дурак',cat:'cards',art:'cards',
+  desc:['Attack, defend and outwit your computer opponent in a card duel.','Uzbrūc un aizsargājies kāršu duelī pret datoru.','Атакуй и защищайся в карточной игре против компьютера.'],
+  rules:['Attack with a card. When defending, beat the attacking card or take it.','Uzbrūc ar kārti, aizsargājoties pārsit vai paņem kārti.','Атакуй картой. Защищаясь, побей карту или возьми её.']},
+ {id:'chess',name:'Chess',lv:'Šahs',ru:'Шахматы',cat:'strategy',art:'chess',
+  desc:['A real chess board, legal moves and a computer opponent.','Šahs ar atļauto gājienu pārbaudi un datora pretinieku.','Шахматы с проверкой допустимых ходов и игрой против компьютера.'],
+  rules:['Choose a white piece and a highlighted square. Checkmate the computer.','Izvēlies balto figūru un iezīmēto lauciņu. Piesaki matu.','Выбери белую фигуру и выделенную клетку. Поставь мат.']},
+ {id:'domino',name:'Domino',lv:'Domino',ru:'Домино',cat:'board',art:'domino',fresh:true,
+  desc:['Classic double-six draw dominoes, played against a clever computer rival.','Klasiskais domino pret datoru, ar kauliņu vilkšanu un punktiem.','Классическое домино с добором костяшек против компьютера.'],
+  rules:['Select a matching tile; place it on the left or right end. Draw from stock if needed.','Izvēlies atbilstošu kauliņu un novieto kreisajā vai labajā pusē. Ja vajag, ņem no rezerves.','Выбери подходящую костяшку, положи слева или справа либо добери из запаса.']},
+ {id:'zole',name:'Zole',lv:'Zole',ru:'Золе',cat:'cards',art:'zole',fresh:true,
+  desc:['The beloved Latvian 26-card trick-taking game, with bidding and trumps.','Latviešu 26 kāršu Zole ar solīšanu, trumpjiem un datoru.','Латышская игра Золе на 26 карт со ставками и козырями.'],
+  rules:['Bid big, Zole or pass. Follow suit, win tricks and try to collect 61+ eyes.','Soli lielo, zoli vai laid garām. Ievēro mastu un savāc vismaz 61 aci.','Выбирай «большой», «золе» или пас. Следуй масти и набирай очки.']}
+];
+const GAME=Object.fromEntries(INFO.map(x=>[x.id,x]));
+const modulePaths={wolf:'../games/legacy-adapter.js',domino:'../games/legacy-adapter.js',zole:'../games/legacy-adapter.js',formula:'../games/formula.js',blocks:'../games/blocks.js',venice:'../games/venice.js',moto:'../games/moto.js',snooker:'../games/snooker.js',darts:'../games/darts.js',farm:'../games/farm.js',cards:'../games/cards.js',chess:'../games/chess.js'};
+function words(entry,lang,type){if(lang==='lv')return type==='name'?entry.lv:entry[type==='desc'?'desc':'rules'][1];if(lang==='ru')return type==='name'?entry.ru:entry[type==='desc'?'desc':'rules'][2];if(lang!=='en-GB'&&type==='desc')return translate(lang,entry.cat)+' · '+translate(lang,'free')+' · '+translate(lang,'instant')+'.';if(lang!=='en-GB'&&type==='rules')return translate(lang,'tip');return type==='name'?entry.name:entry[type==='desc'?'desc':'rules'][0]}
+function iconButton(label,click,tip,additionalClass=''){return h('button',{className:'header-icon '+additionalClass,type:'button',onClick:click,title:tip,'aria-label':tip},label)}
+let currentAudio=null;
+function beep(hz,length=.07,enabled=true){if(!enabled)return;try{const Cls=window.AudioContext||window.webkitAudioContext;if(!Cls)return;if(!currentAudio)currentAudio=new Cls();if(currentAudio.state==='suspended')currentAudio.resume();const o=currentAudio.createOscillator(),gain=currentAudio.createGain();o.type='sine';o.frequency.value=hz;gain.gain.setValueAtTime(.03,currentAudio.currentTime);gain.gain.exponentialRampToValueAtTime(.0001,currentAudio.currentTime+length);o.connect(gain).connect(currentAudio.destination);o.start();o.stop(currentAudio.currentTime+length)}catch{}}
+
+class GameStage extends React.Component {
+ constructor(props){super(props);this.state={error:null,loading:true};this.dead=false;this.session=null;this.holder=null}
+ componentDidMount(){this.mount()}
+ componentDidUpdate(prev){if(prev.id!==this.props.id){this.cleanup();this.setState({loading:true,error:null},()=>this.mount())} else if(prev.lang!==this.props.lang){this.session?.localize?.()}}
+ componentWillUnmount(){this.dead=true;this.cleanup()}
+ cleanup(){if(this.session){try{this.session.destroy?.()}catch(e){console.error(e)}this.session=null}}
+ async mount(){const id=this.props.id;this.dead=false;try{const mod=await import(modulePaths[id]);if(this.dead||this.props.id!==id||!this.holder)return;
+   const api={locale:(en,lv)=>this.props.lang==='lv'?lv:en, t:key=>translate(this.props.lang,key), onScore:score=>this.props.onScore(id,score), beep:(freq,d)=>beep(freq,d,this.props.sound), best:this.props.best||0};
+   const result=['wolf','domino','zole'].includes(id)?mod.mountLegacy(id,this.holder,api):mod.mountGame(this.holder,api);
+   this.session=typeof result==='function'?{destroy:result}:result;
+   this.setState({loading:false});
+ }catch(err){console.error('Game failed to mount',id,err);if(!this.dead)this.setState({error:String(err?.message||err),loading:false})}}
+ render(){return h('div',{className:'game-area'},this.state.loading?h('div',{className:'loading-game','aria-live':'polite'},'✦  '+translate(this.props.lang,'instant')+'…'):null,
+  this.state.error?h('div',{className:'error-game',role:'alert'},this.state.error):null,
+  h('div',{className:'mounted-game',ref:el=>{this.holder=el}}))}
+}
+
+class App extends React.Component {
+ constructor(props){super(props);const pref=getPrefs();const initial=readHash();this.state={lang:normalizeLang(pref.lang||'en-GB'),theme:pref.theme==='light'?'light':'dark',sound:getSoundPref(),view:GAME[initial]?initial:null,filter:'all',query:'',favs:Array.isArray(pref.favs)?pref.favs:[],best:(pref.best&&typeof pref.best==='object')?pref.best:{},restart:0,installEvent:null,helpOpen:false};this.hashChanged=this.hashChanged.bind(this);this.onInstall=this.onInstall.bind(this)}
+ componentDidMount(){window.addEventListener('hashchange',this.hashChanged);window.addEventListener('beforeinstallprompt',this.onInstall);window.addEventListener('keydown',this.handleGlobalKey);document.documentElement.dataset.theme=this.state.theme;document.documentElement.lang=this.state.lang;window.addEventListener('appinstalled',()=>this.setState({installEvent:null}));}
+ componentWillUnmount(){window.removeEventListener('hashchange',this.hashChanged);window.removeEventListener('beforeinstallprompt',this.onInstall);window.removeEventListener('keydown',this.handleGlobalKey);window.G63HelpOpen=false}
+ hashChanged(){const id=readHash();window.G63HelpOpen=false;this.setState({view:GAME[id]?id:null,restart:0,helpOpen:false},()=>{window.scrollTo({top:0,behavior:'instant'})})}
+ onInstall(e){e.preventDefault();this.setState({installEvent:e})}
+ persist(state){savePrefs({lang:state.lang,theme:state.theme,sound:state.sound,favs:state.favs,best:state.best})}
+ updatePrefs(delta){this.setState(state=>Object.assign({},delta),()=>this.persist(this.state))}
+ changeLang(e){const lang=normalizeLang(e.target.value);this.updatePrefs({lang});document.documentElement.lang=lang;document.title='Games 63 · '+translate(lang,'games')}
+ changeTheme(){const theme=this.state.theme==='dark'?'light':'dark';this.updatePrefs({theme});document.documentElement.dataset.theme=theme}
+ toggleFavorite(id){const favs=this.state.favs.includes(id)?this.state.favs.filter(v=>v!==id):[...this.state.favs,id];this.updatePrefs({favs})}
+ updateScore=(id,n)=>{const score=Math.max(0,Math.floor(Number(n)||0));const old=this.state.best[id]||0;if(score<=old)return;this.setState(state=>({best:{...state.best,[id]:score}}),()=>this.persist(this.state))}
+ open=(id)=>{location.hash='game/'+id; if(this.state.view===id)window.scrollTo({top:0,behavior:'smooth'})}
+ goHome=()=>{if(location.hash){location.hash='';return;}this.setState({view:null});window.scrollTo({top:0,behavior:'smooth'})}
+ goFavorites=()=>{this.setState({view:null,filter:'fav'},()=>{if(location.hash)location.hash='';setTimeout(()=>document.getElementById('games-list')?.scrollIntoView({behavior:'smooth',block:'start'}),10)})}
+ goAll=()=>{this.setState({view:null,filter:'all'},()=>{if(location.hash)location.hash='';setTimeout(()=>document.getElementById('games-list')?.scrollIntoView({behavior:'smooth',block:'start'}),10)})}
+ install=async()=>{const e=this.state.installEvent;if(!e)return;await e.prompt();await e.userChoice;this.setState({installEvent:null})}
+ get tr(){return k=>translate(this.state.lang,k)}
+ handleGlobalKey=(e)=>{if(e.key==='Escape'&&this.state.helpOpen){e.preventDefault();this.closeHelp()}else if(e.key==='?'&&this.state.view&&!this.state.helpOpen&&!e.target?.matches?.('input,select,textarea')){e.preventDefault();this.openHelp()}}
+ openHelp=()=>{this.helpReturn=document.activeElement;window.G63HelpOpen=true;this.setState({helpOpen:true},()=>{document.querySelector('.help-modal-close')?.focus()})}
+ closeHelp=()=>{window.G63HelpOpen=false;this.setState({helpOpen:false},()=>{if(this.helpReturn?.isConnected)this.helpReturn.focus()})}
+ toggleSound=()=>{const next=!this.state.sound;try{localStorage.setItem('games63.sound.v2.1',next?'on':'off')}catch{}this.updatePrefs({sound:next});if(next)beep(740,.12,true)}
+ renderHelpModal(){if(!this.state.helpOpen||!GAME[this.state.view])return null;const game=GAME[this.state.view],lang=this.state.lang,tr=this.tr,data=helpData(game.id,lang);return h('div',{className:'help-modal-backdrop',role:'presentation',onMouseDown:e=>{if(e.target===e.currentTarget)this.closeHelp()}},h('section',{className:'help-modal',role:'dialog','aria-modal':true,'aria-labelledby':'help-dialog-title',onKeyDown:e=>{if(e.key==='Tab'){const nodes=[...e.currentTarget.querySelectorAll('button:not([disabled])')];if(!nodes.length)return;const i=nodes.indexOf(document.activeElement);if(e.shiftKey&&i===0){e.preventDefault();nodes[nodes.length-1].focus()}else if(!e.shiftKey&&i===nodes.length-1){e.preventDefault();nodes[0].focus()}}}},
+  h('header',{className:'help-modal-head'},h('div',null,h('span',{className:'eyebrow'},'✦ '+data.labels.rules),h('h2',{id:'help-dialog-title'},words(game,lang,'name'))),h('button',{type:'button',className:'help-modal-close',onClick:this.closeHelp,'aria-label':data.labels.close},'✕')),
+  h('div',{className:'help-modal-content'},h('span',{className:'help-rule-title'},'★ '+data.labels.objective),h('ol',{className:'help-step-list'},data.steps.map((step,i)=>h('li',{key:i},h('span',{className:'help-step-n'},String(i+1).padStart(2,'0')),h('span',null,step)))),h('div',{className:'help-key-row'},h('span',null,'⌨'),h('code',null,data.keys)),h('p',{className:'help-pause'},'⏸  '+data.labels.pause)),
+  h('footer',{className:'help-modal-bottom'},h('button',{type:'button',className:'btn-primary',onClick:this.closeHelp},tr('play')+'  →'))))}
+
+ renderHeader(){const tr=this.tr;return h('header',{className:'site-header'},h('div',{className:'header-inner'},
+  h('a',{className:'logo',href:'#',onClick:e=>{e.preventDefault();this.goHome()}},h('span',{className:'logo-mark','aria-hidden':'true'},h('img',{src:'assets/icon.svg',alt:'',width:44,height:44})),h('span',{className:'logo-text'},'Games',h('span',null,'63'),h('small',null,'PLAY MORE. SMILE MORE.'))),
+  h('nav',{className:'header-nav','aria-label':'Main navigation'},h('a',{href:'#',className:!this.state.view&&this.state.filter!=='fav'?'active':'',onClick:e=>{e.preventDefault();this.goHome()}},tr('home')),h('a',{href:'#games-list',onClick:e=>{e.preventDefault();this.goAll()}},tr('all')),h('a',{href:'#games-list',className:this.state.filter==='fav'?'active':'',onClick:e=>{e.preventDefault();this.goFavorites()}},'♡  '+tr('favorites'))),
+  h('div',{className:'header-tools'},h('label',{className:'lang-group'},h('span',{className:'sr-only'},'Language'),h('select',{className:'lang-select',value:this.state.lang,onChange:e=>this.changeLang(e),'aria-label':'Language'},LANGS.map(([code,name])=>h('option',{key:code,value:code},name)))),
+  iconButton(this.state.sound?'🔊':'🔇',this.toggleSound,tr('sound')+': '+(this.state.sound?'on':'off'),this.state.sound?'sound-on':'sound-off'),
+  iconButton(this.state.theme==='dark'?'☼':'☾',()=>this.changeTheme(),this.state.theme==='dark'?'Switch to light theme':'Switch to dark theme'),
+  this.state.installEvent?h('button',{className:'header-pill install-button',type:'button',onClick:this.install},'↓ '+tr('install')):null)))}
+ renderHero(){const tr=this.tr;return h('section',{className:'hero'},h('div',{className:'hero-copy'},h('span',{className:'eyebrow'},'✦  '+tr('free')+'  ·  '+tr('instant')),h('h1',null,tr('heroFirst'),' ',h('span',null,tr('heroSecond'))),h('p',null,tr('heroText')),
+  h('div',{className:'hero-actions'},h('button',{className:'btn-primary',type:'button',onClick:()=>document.getElementById('games-list')?.scrollIntoView({behavior:'smooth'})},tr('explore'),' →'),h('button',{className:'btn-secondary',type:'button',onClick:()=>this.open('wolf')},'🥚  '+tr('play')+' '+words(GAME.wolf,this.state.lang,'name'))),
+  h('div',{className:'hero-stat'},h('span',null,h('strong',null,'12'),' '+tr('games')),h('span',null,'⚡  '+tr('instant')),h('span',null,'✦  '+tr('mobile')))),
+  h('div',{className:'hero-visual','aria-hidden':'true'},h('div',{className:'hero-board'},h('div',{className:'hero-pad'},'🎮'),h('div',{className:'hero-small top'},'✦ 12 games'),h('div',{className:'hero-small bottom'},'🏆  '+tr('best')))))}
+ renderCard(game){const tr=this.tr,flag=this.state.favs.includes(game.id),name=words(game,this.state.lang,'name');return h('article',{className:'game-card',key:game.id},
+  h('a',{className:'game-cover',href:'#game/'+game.id,onClick:e=>{e.preventDefault();this.open(game.id)},'aria-label':tr('play')+' '+name},h('img',{src:'assets/art/'+game.art+'.svg',alt:'',loading:'eager',decoding:'async',width:'600',height:'380'}),h('span',{className:'card-label'},game.fresh?tr('new'):tr(game.cat))),
+  h('button',{className:'fav-btn',type:'button',title:tr('favorites'),'aria-label':tr('favorites')+': '+name,'aria-pressed':flag,onClick:()=>this.toggleFavorite(game.id)},flag?'♥':'♡'),
+  h('div',{className:'game-card-content'},h('h3',null,name),h('p',null,words(game,this.state.lang,'desc')),
+   h('div',{className:'game-card-bottom'},h('span',{className:'score-small'},tr('best')+': ',h('strong',null,this.state.best[game.id]||'—')),h('a',{className:'card-play',href:'#game/'+game.id,onClick:e=>{e.preventDefault();this.open(game.id)}},tr('play'),' ↗'))))}
+ renderBrowse(){const tr=this.tr,cats=['all','arcade','racing','puzzle','sports','strategy','cards','board','fav'];const q=this.state.query.toLocaleLowerCase().trim(),data=INFO.filter(g=>{if(this.state.filter==='fav'&&!this.state.favs.includes(g.id))return false;if(this.state.filter!=='fav'&&this.state.filter!=='all'&&g.cat!==this.state.filter)return false;if(!q)return true;return [g.name,g.lv,g.ru,tr(g.cat),words(g,this.state.lang,'desc')].some(x=>x.toLocaleLowerCase().includes(q))});return h('div',{className:'browse-page'},
+ this.renderHero(),h('section',{id:'games-list',className:'game-list-section','aria-label':tr('games')},h('div',{className:'section-head'},h('div',{className:'section-title'},h('div',{className:'eyebrow'},tr('collection')),h('h2',null,tr('choose')),h('p',null,tr('collectionNote'))),h('span',{className:'count-games'},INFO.length+' '+tr('games'))),
+ h('div',{className:'listing-tools'},h('div',{className:'filters',role:'group','aria-label':'Game categories'},cats.map(id=>h('button',{key:id,className:'filter'+(this.state.filter===id?' active':''),type:'button','aria-pressed':this.state.filter===id,onClick:()=>this.setState({filter:id})},id==='fav'?'♡ '+tr('favorites'):tr(id)))),
+ h('label',{className:'search'},h('span',{'aria-hidden':'true'},'⌕'),h('input',{type:'search',value:this.state.query,placeholder:tr('search'),'aria-label':tr('search'),onChange:e=>this.setState({query:e.target.value})}))),
+ data.length?h('div',{className:'games-grid'},data.map(g=>this.renderCard(g))):h('div',{className:'empty'},h('strong',null,tr('noGames')),h('p',null,tr('tryAgain')),h('button',{className:'button-wide',onClick:()=>this.setState({query:'',filter:'all'})},tr('clear')))),
+ h('section',{className:'why-row'},[[ '⚡','benefitA','benefitADesc'],['▣','benefitB','benefitBDesc'],['♡','benefitC','benefitCDesc']].map(([icon,title,desc],i)=>h('div',{className:'why',key:i},h('span',{className:'why-ico'},icon),h('b',null,tr(title)),h('p',null,tr(desc))))))}
+ renderGame(){const game=GAME[this.state.view],tr=this.tr,name=words(game,this.state.lang,'name');return h('section',{className:'game-play-view'},
+ h('div',{className:'game-top'},h('div',null,h('a',{className:'back-link',href:'#',onClick:e=>{e.preventDefault();this.goHome()}},'←  '+tr('back')),h('div',{className:'eyebrow',style:{marginTop:20}},tr(game.cat)),h('h1',{className:'game-title'},name),h('p',{className:'game-summary'},words(game,this.state.lang,'desc'))),
+ h('div',{className:'game-scoreline'},h('div',{className:'score-pill'},tr('best'),h('strong',null,this.state.best[game.id]||'0')),h('button',{type:'button',className:'game-help-trigger',onClick:this.openHelp,'aria-haspopup':'dialog'},'ⓘ  '+tr('how')),h('button',{type:'button',className:'btn-primary',onClick:()=>this.setState(s=>({restart:s.restart+1}))},'↻  '+tr('restart')))),
+ h('div',{className:'game-layout'},h('div',{className:'game-panel'},h(GameStage,{key:game.id+'-'+this.state.restart+'-'+this.state.lang, id:game.id,lang:this.state.lang,best:this.state.best[game.id]||0,onScore:this.updateScore,sound:this.state.sound}),h('p',{className:'help-note'},tr('tip'))),
+ h('aside',{className:'game-side'},h('div',{className:'side-card'},h('h3',null,'✦  '+tr('how')),h('p',{className:'side-body'},words(game,this.state.lang,'rules')),h('button',{className:'button-wide help-wide',onClick:this.openHelp,'aria-haspopup':'dialog'},'ⓘ  '+tr('how'))),h('div',{className:'side-card'},h('h3',null,'♡  '+tr('favorites')),h('p',{className:'side-body'},tr('saved')),h('button',{className:'button-wide',onClick:()=>this.toggleFavorite(game.id)},this.state.favs.includes(game.id)?'♥  '+tr('favorites'):'♡  '+tr('favorites'))),
+ h('div',{className:'side-card'},h('h3',null,'↗  '+tr('all')),h('p',{className:'side-body'},tr('collectionNote')),h('button',{className:'button-wide',onClick:this.goAll},'←  '+tr('all'))))))}
+ renderPromo(){const tr=this.tr;return h('div',{className:'promo-wrap'},h('section',{className:'promo'},h('span',{className:'promo-orb','aria-hidden':'true'}),h('div',{className:'promo-copy'},h('div',{className:'eyebrow',style:{color:'#85efdf'}},h('span',{className:'status-dot'}),tr('promoSmall')),h('h2',null,tr('promoTitle')),h('p',null,tr('promoDesc')),h('div',{className:'promo-tags'},['Web apps','WordPress','WooCommerce','AI','UX / UI'].map(x=>h('span',{key:x},x)))),h('a',{className:'promo-link',href:'https://digitalpulse.click/',target:'_blank',rel:'noopener noreferrer'},h('span',null,tr('promoBtn')),h('span',null,'↗'))))}
+ renderFooter(){const tr=this.tr;return h('footer',{className:'footer'},h('div',{className:'footer-inner'},h('div',null,h('strong',null,'Games',h('span',null,'63')),h('p',null,'© '+new Date().getFullYear()+' · '+tr('copyright')+' · v'+VERSION)),h('div',{className:'footer-right'},h('span',null,tr('builtBy')+' ',h('a',{href:'https://digitalpulse.click/',target:'_blank',rel:'noopener noreferrer'},'DigitalPulse.click')),h('span',null,tr('free')+' · '+tr('mobile')))))}
+ render(){return h('div',{className:'app-root'},h('div',{className:'site-bg','aria-hidden':'true'}),h('a',{className:'skip-link',href:'#main'},'Skip to main content'),this.renderHeader(),h('main',{id:'main',className:'app-shell'},this.state.view?this.renderGame():this.renderBrowse()),this.renderPromo(),this.renderFooter(),this.renderHelpModal())}
+}
+ReactDOM.render(h(App),document.getElementById('app'));
+if ('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));

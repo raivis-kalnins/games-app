@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Games 63 game controller">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#20214c"/><stop offset=".55" stop-color="#142b46"/><stop offset="1" stop-color="#102e39"/></linearGradient>
+  <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#baa0ff"/><stop offset=".53" stop-color="#7f80f7"/><stop offset="1" stop-color="#54e6d3"/></linearGradient>
+  <linearGradient id="pad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c3b7b"/><stop offset="1" stop-color="#176778"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="10"/></filter>
+</defs>
+<rect width="512" height="512" rx="110" fill="url(#bg)"/>
+<rect x="12" y="12" width="488" height="488" rx="100" fill="none" stroke="#91a9f9" stroke-opacity=".35" stroke-width="7"/>
+<ellipse cx="242" cy="371" rx="173" ry="45" fill="#43ddd2" opacity=".19" filter="url(#glow)"/>
+<path d="M143 177c-34 0-64 25-74 60L41 338c-12 42 32 74 66 53l90-57h118l90 57c34 21 78-11 66-53l-28-101c-10-35-40-60-74-60Z" fill="url(#shell)"/>
+<path d="M143 186c-31 0-55 20-64 52L53 339c-7 26 18 45 42 30l97-63h128l97 63c24 15 49-4 42-30l-26-101c-9-32-33-52-64-52Z" fill="url(#pad)"/>
+<path d="M143 194h225c25 0 43 14 49 37l-2 3H96l-2-3c6-23 24-37 49-37Z" fill="#ffffff" opacity=".1"/>
+<rect x="122" y="247" width="105" height="34" rx="12" fill="#162439"/>
+<rect x="158" y="212" width="34" height="104" rx="12" fill="#162439"/>
+<rect x="132" y="255" width="85" height="17" rx="7" fill="#b9f7ed"/>
+<rect x="166" y="222" width="17" height="85" rx="7" fill="#b9f7ed"/>
+<circle cx="350" cy="244" r="25" fill="#f9a7ba"/><circle cx="390" cy="289" r="25" fill="#76edd7"/>
+<circle cx="350" cy="244" r="12" fill="#ffe3e9" opacity=".45"/><circle cx="390" cy="289" r="12" fill="#e1fff2" opacity=".4"/>
+<path d="M248 288c4-10 13-20 22-20s16 9 15 20M232 320h56" fill="none" stroke="#dde7ff" stroke-width="11" stroke-linecap="round" opacity=".82"/>
+<path d="M256 129l10 19 21 4-16 16 3 22-18-10-19 10 4-22-17-16 22-4Z" fill="#feeaa1"/>
+</svg>
