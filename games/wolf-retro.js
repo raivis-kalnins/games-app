@@ -1,14 +1,14 @@
-/* Games 63 egg-catching arcade: original vector console graphics, four accurate
- * basket positions, multi-level timing and deterministic catch windows. */
+/* Original four-lane egg-catching arcade. Eggs visibly fall into the correctly
+ * aligned basket; missed eggs fall and break. Progressive 12-level speed. */
 window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
   const W=800,H=540;
   const lanes=[
-    {sx:172,sy:160,ex:349,ey:227,side:-1,upper:true},
-    {sx:628,sy:160,ex:451,ey:227,side:1,upper:true},
-    {sx:172,sy:337,ex:349,ey:362,side:-1,upper:false},
-    {sx:628,sy:337,ex:451,ey:362,side:1,upper:false}
+    {sx:172,sy:160,ex:325,ey:227,side:-1,upper:true},
+    {sx:628,sy:160,ex:475,ey:227,side:1,upper:true},
+    {sx:172,sy:337,ex:336,ey:362,side:-1,upper:false},
+    {sx:628,sy:337,ex:464,ey:362,side:1,upper:false}
   ];
-  let position=0,mode='A',running=true,misses=0,eggs=[],splats=[],spawnLeft=.6,elapsed=0,level=1,score=0;
+  let position=0,mode='A',running=true,misses=0,eggs=[],splats=[],caught=[],spawnLeft=.6,elapsed=0,level=1,score=0;
   let basket={x:349,y:227},wiggle=0,celebrate=0;
   const sounds=(hz,d=.07)=>g.beep?.(hz,d);
   const buttons=[];
@@ -16,7 +16,7 @@ window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
   function add(label,fn){const b=btn(label,()=>{fn();sync()});buttons.push(b)}
   function choose(i){if(g.over||!running)return;position=Math.max(0,Math.min(3,i));sounds(340,.028)}
   function newMode(m){mode=m;start()}
-  function start(){position=0;running=true;misses=0;eggs=[];splats=[];spawnLeft=.9;elapsed=0;level=mode==='A'?1:3;score=0;celebrate=0;g.over=false;g.score=0;basket={x:lanes[0].ex,y:lanes[0].ey};show('');sync()}
+  function start(){position=0;running=true;misses=0;eggs=[];splats=[];caught=[];spawnLeft=.9;elapsed=0;level=mode==='A'?1:3;score=0;celebrate=0;g.over=false;g.score=0;basket={x:lanes[0].ex,y:lanes[0].ey};show('');sync()}
   add('1 ↖',()=>choose(0));add('2 ↗',()=>choose(1));add('3 ↙',()=>choose(2));add('4 ↘',()=>choose(3));
   add('A',()=>newMode('A'));add('B',()=>newMode('B'));
   add('⏯',()=>{if(g.over){start();return}running=!running;show(running?'':t('paused'))});
@@ -32,15 +32,16 @@ window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
   g.localize=()=>{buttons[4].title=t('gameA');buttons[5].title=t('gameB');buttons[6].title=t('pause');if(!running&&!g.over)show(t('paused'))};
   function interval(){return Math.max(.165,.62*Math.pow(.89,level-1))}
   function period(){return Math.max(.31,1.6*Math.pow(.88,level-1))}
-  function endEgg(e){if(position===e.lane){score++;g.score=score;points(score);celebrate=.35;
+  function endEgg(e){if(position===e.lane){caught.push({x:lanes[e.lane].ex,y:lanes[e.lane].ey-4,age:0});score++;g.score=score;points(score);celebrate=.35;
       sounds(620+score%4*45,.07);const newLevel=(mode==='B'?3:1)+Math.floor(score/12);
       if(newLevel>level){level=Math.min(12,newLevel);celebrate=1;sounds(880,.15)}
-    }else{misses++;splats.push({x:lanes[e.lane].ex,y:lanes[e.lane].ey+23,age:0});sounds(125,.15);
+    }else{misses++;splats.push({x:lanes[e.lane].ex,y:lanes[e.lane].ey-4,age:0});sounds(125,.15);
       if(misses>=4){g.over=true;running=false;show(t('gameOver')+' · '+t('score')+': '+score)}
     }}
   g.update=dt=>{wiggle+=dt;const target=lanes[position];const ease=Math.min(1,dt*17);
     basket.x+=(target.ex-basket.x)*ease;basket.y+=(target.ey-basket.y)*ease;celebrate=Math.max(0,celebrate-dt);
     splats.forEach(a=>a.age+=dt);splats=splats.filter(a=>a.age<.85);
+    caught.forEach(a=>a.age+=dt);caught=caught.filter(a=>a.age<.26);
     if(!running||g.over)return;
     elapsed+=dt;spawnLeft-=dt;
     if(spawnLeft<=0){const available=[0,1,2,3].filter(i=>!eggs.some(e=>e.lane===i&&e.step<3));
@@ -102,9 +103,10 @@ window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
     txt(String(score).padStart(4,'0'),401,119,49,'#334f40','monospace',850);
     txt(t('game'+mode),405,139,11,'#546f60','monospace');
     txt('LV '+level,246,116,16,'#466b5c','monospace');
+    fill('#66857555');c.fillRect(198,122,98,6);fill('#547b63');c.fillRect(198,122,98*(score%12)/12,6);
     for(let i=0;i<4;i++){fill(i<misses?'#a04c4b':'#6b8a75');c.beginPath();c.arc(542+i*24,112,7,0,7);c.fill();}
     lanes.forEach((lane,i)=>{
-      chicken(lane.sx+(lane.side===1?31:-31),lane.sy-22,lane.side<0);
+      chicken(lane.sx+(lane.side===1?31:-31),lane.sy-22,lane.side>0);
       path([[lane.sx,lane.sy+20],[lane.ex,lane.ey+5]],'#756c57',8);
       path([[lane.sx,lane.sy+34],[lane.ex,lane.ey+19]],'#86795f',4);
       for(let k=1;k<=5;k++){
@@ -113,9 +115,13 @@ window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
       }
       if(i===position){oval(lane.ex,lane.ey+11,31,22,'#f4fcd050')}
     });
+    for(const e of caught){c.save();c.globalAlpha=Math.max(0,1-e.age/.28);egg(e.x,e.y+e.age*108,.05);c.restore()}
     drawWolf();
-    for(const e of eggs){const lane=lanes[e.lane],p=Math.min(.995,(e.step+e.clock/interval())/6);egg(lane.sx+(lane.ex-lane.sx)*p,lane.sy+21+(lane.ey-lane.sy)*p,p*.2)}
-    for(const s of splats){c.save();c.globalAlpha=1-s.age/.85;fill('#f3f0d4');oval(s.x,s.y,15+s.age*10,5,'#f0eeda');stroke('#e5d8a0',3);c.beginPath();c.arc(s.x,s.y,14+s.age*10,0,Math.PI);c.stroke();c.restore()}
+    for(const e of eggs){const lane=lanes[e.lane],p=Math.min(.995,(e.step+e.clock/interval())/6);egg(lane.sx+(lane.ex-lane.sx)*p,lane.sy+21+(lane.ey-4-lane.sy-21)*p,p*.2)}
+    for(const s of splats){c.save();c.globalAlpha=1-s.age/.85;
+      if(s.age<.28)egg(s.x+Math.sin(s.age*12)*9,s.y+s.age*145,s.age*4);
+      else{fill('#f3f0d4');oval(s.x,s.y+32,15+s.age*10,5,'#f0eeda');stroke('#e5d8a0',3);c.beginPath();c.arc(s.x,s.y+32,14+s.age*10,0,Math.PI);c.stroke()}
+      c.restore()}
     if(celebrate>.3){txt('✦ +1 ✦',400,171,18,'#538167')}
     if(!running||g.over){fill('#e6f1d6dc');c.beginPath();c.roundRect(265,206,270,102,14);c.fill();txt(g.over?t('gameOver'):t('paused'),400,244,30,'#30483c','system-ui');txt(g.over?t('restart'):t('resume'),400,278,15,'#49685a')}
     for(let i=0;i<4;i++){const x=211+i*126;txt(String(i+1),x-16,507,18,'#625e53','monospace');const dx=i%2?1:-1,dy=i<2?-1:1;path([[x+5,505],[x+19*dx,505+11*dy]],'#6e6b60',3);path([[x+19*dx,505+11*dy],[x+19*dx-7*dx,505+11*dy]],'#6e6b60',2);path([[x+19*dx,505+11*dy],[x+19*dx,505+11*dy-7*dy]],'#6e6b60',2)}

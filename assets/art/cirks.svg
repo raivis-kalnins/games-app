@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 390" role="img" aria-label="Snakes and ladders Cirks game">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#2d4265"/><stop offset="1" stop-color="#1a313d"/></linearGradient><filter id="sh"><feDropShadow dy="10" stdDeviation="12" flood-opacity=".38"/></filter></defs><rect width="640" height="390" fill="url(#bg)"/>
+<g transform="translate(175 38) rotate(5 155 154)" filter="url(#sh)"><rect width="304" height="304" rx="14" fill="#f8eee0"/><g stroke="#fffaf3" stroke-width="4">
+<path d="M10 10h284v284H10z" fill="#e1eced"/><path d="M10 10h284v47H10zM10 104h284v47H10zM10 198h284v47H10z" fill="#f9ded5"/><path d="M10 10v284M57 10v284M104 10v284M151 10v284M198 10v284M245 10v284M294 10v284"/><path d="M10 57h284M10 104h284M10 151h284M10 198h284M10 245h284"/></g>
+<g stroke="#a5724b" stroke-width="8"><path d="M80 263L172 40M99 271L191 49"/><path d="M276 259L224 120M289 251L237 112"/></g><g stroke="#f4dfac" stroke-width="5"><path d="M84 230l26 5M96 200l26 6M109 171l26 6M122 141l26 6M135 112l26 6M149 83l26 6"/><path d="M270 219l-27 11M259 189l-26 11M250 158l-26 11"/></g>
+<path d="M55 73Q130 125 93 180T218 231T253 276" fill="none" stroke="#a54fa2" stroke-width="17" stroke-linecap="round"/><path d="M55 73Q130 125 93 180T218 231T253 276" fill="none" stroke="#ffb2e8" stroke-width="3" stroke-dasharray="10 11"/><circle cx="55" cy="73" r="16" fill="#a54fa2"/><g fill="#fff"><circle cx="50" cy="68" r="4"/><circle cx="60" cy="68" r="4"/></g>
+<circle cx="192" cy="254" r="14" fill="#1eab91" stroke="#fff" stroke-width="4"/><circle cx="147" cy="270" r="14" fill="#9459d8" stroke="#fff" stroke-width="4"/></g>
+<text x="27" y="60" font-size="36" font-family="system-ui" font-weight="900" fill="#fff">CIRKS</text><text x="28" y="83" font-size="14" font-family="system-ui" font-weight="750" fill="#8ceada">SNAKES &amp; LADDERS</text>
+</svg>

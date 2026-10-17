@@ -1,4 +1,37 @@
-# Games 63 v2.1.0
+# Games 63 — v2.3.0 cPanel release
+
+Latest production package for **https://games.63.lv/**. This is an update to the 16-game v2.2.0 release. It runs on standard cPanel PHP hosting (no Node.js build required on the server), using bundled React for the interface and standalone Canvas games. This release still uses the existing local React 16 runtime; it does **not** upgrade to React 19/Vite.
+
+## Install / upgrade (recommended)
+
+1. In cPanel > File Manager, open the **document root for games.63.lv**; do not assume it is the account's main public_html directory.
+2. In File Manager Settings, enable **Show Hidden Files** and back up the current `.htaccess` and site files.
+3. Extract **games63-v2.3.0-changed-files.zip** directly over the existing v2.2.0 installation, preserving folder paths (`assets/`, `games/`). If installing a fresh site, extract **games63-cpanel-v2.3.0-full.zip** instead.
+4. Use cPanel permissions **0644** for files and **0755** for directories. Never apply `0777`.
+5. Open https://games.63.lv/, then use the new header **⟳** button to clear the Games 63 PWA cache and reload. This clears offline game files but deliberately does not erase saved favourites or high scores.
+6. For a test, open Wolf & Eggs on a phone: a portrait orientation prompt appears; rotate to landscape or use the manual portrait override. Close **×** to return to the catalog.
+
+## v2.3.0 changes
+
+- Separate breathing room for the coloured **63** in the header and footer logos.
+- Hero headings now wrap correctly at narrow desktop and phone widths.
+- Mobile game modal contains the gameplay, controls and prominent close button; landscape games wait at a rotation prompt rather than running behind it.
+- Mobile game modal survives the device rotating from portrait to landscape. It also supports playing in portrait when rotation is locked.
+- Improved Formula Sprint with visible levels 1–12 and smarter traffic that occasionally changes lanes; added progress gauge to existing Wolf & Eggs levels.
+- Accessible cache-reset button and fixed an undefined PWA cache constant that could block resource loads. Safe cache policies for updated PHP/JS/CSS and offline fallback.
+- English (UK) default website language, canonical/Open Graph metadata, CollectionPage JSON-LD game list, improved initial loading and lazy-loaded cover art.
+- All 16 games, translations, DigitalPulse promo, records and favourites are preserved.
+
+## Limitations
+
+- CSS/UI and selected game difficulty mechanics are upgraded. The other 14 game engines retain their existing v2.2.0 rule sets and AI levels; this is **not** a rewrite of all games.
+- Phone orientation cannot be locked reliably from a standard webpage on every browser. The app therefore shows a rotation hint and optional portrait mode instead of promising OS-level orientation control.
+- All game descriptions are localised fully in English, Latvian and Russian; additional European language packs cover the portal interface and use English fallback for some in-game text.
+- Browser automation tests run on a script-injected local page because the test environment blocks local URL navigation. Test the installed ZIP on real devices after deployment; we have not deployed it to the live domain.
+
+---
+
+# Games 63 v2.2.0
 
 A local-first, original **12-game browser portal** for `https://games.63.lv/`.
 
@@ -43,7 +76,7 @@ A local-first, original **12-game browser portal** for `https://games.63.lv/`.
 
 - Intended as browser mini-games, **not** commercial Android game clones. Gameplay, artwork, controls and character designs are original interpretations.
 - Single-player versus local computer AI only; no online multiplayer, cross-device sync or server leaderboards.
-- Sound is **off by default** for new visitors and can be enabled using the 🔇 / 🔊 header button; clicks and major events in all 12 games use Web Audio after a user gesture. Mobile sound depends on user interaction and browser policies.
+- Sound is **off by default** for new visitors and can be enabled using the 🔇 / 🔊 header button; clicks and major events in all 16 games use Web Audio after a user gesture. Mobile sound depends on user interaction and browser policies.
 - The first visit requires network access; subsequent visits can run from installed offline cache if allowed by the browser.
 - The entire app uses a normal small cPanel folder structure similar to Radio 63, not WordPress.
 - The DigitalPulse.click section appears above the footer on all pages.
@@ -77,7 +110,7 @@ PHP or the JavaScript application can run.
 
 ### Full install
 
-The complete `games63-cpanel-v2.0.1.zip` contains all 12 games and the fixed
+The complete `games63-cpanel-v2.0.1.zip` contains all 16 games and the fixed
 server config. Back up the site, extract files directly to the subdomain
 root, then reload. Neither installation changes local game scores.
 
@@ -94,3 +127,25 @@ root, then reload. Neither installation changes local game scores.
 - Offline cache key / asset versions updated; `.htaccess` retains the cPanel HTTP 500 fix.
 
 **The app continues to ship a self-contained React compatibility runtime (React 16), not React 19/Vite.** No Node.js installation is required on cPanel. Further migration can be done independently of these gameplay corrections.
+
+
+## v2.2.0 — installation and gameplay
+
+**Site:** https://games.63.lv/
+
+Upload the complete ZIP to the actual `games.63.lv` document root in cPanel and extract it, replacing the previous game files. For v2.1.1 users, the changed-files ZIP is smaller. Make a backup first. cPanel permissions must remain **0644 for files** (including `.htaccess`) and **0755 for folders**. No Node.js, Composer, database or build process is needed on the server.
+
+This release has 16 original/offline-friendly browser mini-games:
+- Wolf & Eggs (four lanes, eggs visibly caught, 12 speed levels)
+- Formula Sprint, Block Stack, Venice Boats, Moto Rider
+- 8-Ball Pool (two human players on the same device; blue solids vs orange stripes, black 8)
+- Darts 301 (aim selection, moving aim, three darts, double-out)
+- Farm City, Durak, Chess, Domino, Zole
+- Novuss Club (simplified rules vs computer; not a regulation sport simulator)
+- Star Hopper (original, non-Nintendo platform game with three stages)
+- City Tycoon (simplified property trading / rent game against the computer)
+- Cirks (Snakes & Ladders; reach square 100 with an exact roll)
+
+**Controls:** Touch/mouse supported for every game. Open the Help button in each game for instructions in English, Latvian or Russian. On mobile the Install button displays only `Install` / `Instalēt` / `Установить` as appropriate. Sounds are muted by default, with the toggle in the header. The PWA service worker caches game files after installation.
+
+**Scope/limitations:** 8-ball pool uses two local players taking turns, not a network multiplayer server. Novuss and City Tycoon are playable simplified adaptations and do not implement every official competition rule. The platform game has original art, physics and characters; no Nintendo assets. UI translations: the original 28 language choices remain, with complete new game guides for EN/LV/RU; other game guides fall back to English. React remains the existing locally bundled v16 runtime; canvas animation runs separately. Browser-level interaction should be tested on the target mobile and desktop devices after upload.

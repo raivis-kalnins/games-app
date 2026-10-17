@@ -3,20 +3,45 @@
   "short_name": "Games 63",
   "id": "./",
   "lang": "en-GB",
-  "description": "12 original lightweight arcade, racing, strategy and card mini-games",
-  "start_url": "./",
+  "description": "16 lightweight arcade, racing, sports, strategy and card mini-games",
+  "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b1020",
   "theme_color": "#0b1020",
   "icons": [
-    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "shortcuts": [
-    {"name":"Wolf & Eggs","url":"./#game/wolf","icons":[{"src":"./assets/icon-192.png","sizes":"192x192"}]},
-    {"name":"Domino","url":"./#game/domino"},
-    {"name":"Zole","url":"./#game/zole"}
+    {
+      "name": "Wolf & Eggs",
+      "url": "./#game/wolf",
+      "icons": [
+        {
+          "src": "./assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Domino",
+      "url": "./#game/domino"
+    },
+    {
+      "name": "Zole",
+      "url": "./#game/zole"
+    }
   ]
 }

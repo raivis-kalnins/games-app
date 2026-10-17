@@ -17,15 +17,15 @@ export function mountGame(root,api){root.replaceChildren();
  const boardHUD=hud(root,'<span>🎯 <b data-darts-remaining>301</b> / 301</span><span>↗ <b data-darts-left>3</b> darts</span><span>🏆 <b data-darts-wins>0</b> wins</span>');
  const announcement=status(root,'');announcement.setAttribute('aria-live','polite');announcement.classList.add('darts-announcement');
  const choices=element('div','darts-difficulty');root.append(choices);
- let difficulty='club',remaining=301,throws=3,wins=Math.max(0,api.best||0),lastVisit=301,aim={x:260,y:138},thrown=[],elapsed=0,wind=0,ended=false,locked=0,bust=false;
+ let difficulty='club',remaining=301,throws=3,wins=Math.max(0,api.best||0),lastVisit=301,aim={x:260,y:260},thrown=[],elapsed=0,wind=0,ended=false,locked=0,bust=false;
  const labels={easy:api.locale('Casual','Viegli'),club:api.locale('Club','Klubs'),hard:api.locale('Pro','Profesionālis')};
  const spreads={easy:14,club:28,hard:43};
  function update(){boardHUD.querySelector('[data-darts-remaining]').textContent=remaining;boardHUD.querySelector('[data-darts-left]').textContent=throws;boardHUD.querySelector('[data-darts-wins]').textContent=wins}
  function notice(en,lv){announcement.textContent=api.locale(en,lv)}
  function setMode(value){difficulty=value;for(const b of choices.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.difficulty===value));reset()}
  for(const id of ['easy','club','hard']){const b=element('button','darts-mode',labels[id]);b.type='button';b.dataset.difficulty=id;b.addEventListener('click',()=>setMode(id),{signal});choices.append(b)}
- function reset(){remaining=301;throws=3;lastVisit=301;aim={x:260,y:138};thrown=[];elapsed=0;wind=rand(-1,1);ended=false;locked=0;bust=false;notice('Aim at the board. Watch the moving crosshair. Finish on a double.','Mērķē uz dēli. Vēro kustīgo tēmekli. Pabeidz ar dubulto sektoru.');update();for(const b of choices.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.difficulty===difficulty))}
- function aiming(e){if(ended||locked)return;const p=point(e);aim={x:clamp(p.x,24,496),y:clamp(p.y,24,496)}}
+ function reset(){remaining=301;throws=3;lastVisit=301;aim={x:260,y:260};thrown=[];elapsed=0;wind=rand(-1,1);ended=false;locked=0;bust=false;notice('1. Tap a number on the board to aim. 2. Press THROW. Finish on a double.','1. Pieskaries sektoram, lai mērķētu. 2. Spied MEST. Pabeidz ar dubulto sektoru.');update();for(const b of choices.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.difficulty===difficulty))}
+ function aiming(e){if(ended||locked)return;const p=point(e);aim={x:clamp(p.x,24,496),y:clamp(p.y,24,496)}; const target=hitAt(aim.x,aim.y);notice(target.points?`Target: ${target.number} (${target.ring}) = ${target.points}`:'Tap inside the board to select a scoring sector.',target.points?`Mērķis: ${target.number} (${target.ring}) = ${target.points} punkti`:'Pieskaries sektoram uz dēļa, lai izvēlētos punktus.')}
  canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture?.(e.pointerId);aiming(e)},{signal});
  canvas.addEventListener('pointermove',e=>{if(e.buttons)aiming(e)},{signal});
  const sway=()=>({x:Math.sin(elapsed*3.1+wind)*spreads[difficulty]*.47+Math.sin(elapsed*6.3)*spreads[difficulty]*.19,
@@ -75,10 +75,11 @@ export function mountGame(root,api){root.replaceChildren();
    for(let i=0;i<thrown.length;i++){const d=thrown[i];ctx.save();ctx.translate(d.x,d.y);ctx.rotate(-.45);
      ctx.fillStyle='#fee6a2';ctx.beginPath();ctx.arc(0,0,5,0,7);ctx.fill();ctx.strokeStyle='#d9edff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(19,-21);ctx.stroke();
      ctx.fillStyle='#97cbea';ctx.beginPath();ctx.moveTo(19,-21);ctx.lineTo(27,-25);ctx.lineTo(23,-17);ctx.fill();ctx.restore()}
-   if(!ended){const d=sway(),x=aim.x+d.x,y=aim.y+d.y;
+   if(!ended){ctx.strokeStyle='#ffe49a';ctx.lineWidth=2;ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(aim.x,aim.y,9,0,7);ctx.stroke();ctx.setLineDash([]);const d=sway(),x=aim.x+d.x,y=aim.y+d.y;
      ctx.shadowColor='#63f2df';ctx.shadowBlur=14;ctx.strokeStyle='#8fffe5';ctx.lineWidth=2.6;
      ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.moveTo(x-22,y);ctx.lineTo(x-8,y);ctx.moveTo(x+8,y);ctx.lineTo(x+22,y);ctx.moveTo(x,y-22);ctx.lineTo(x,y-8);ctx.moveTo(x,y+8);ctx.lineTo(x,y+22);ctx.stroke();ctx.shadowBlur=0;
      ctx.fillStyle='#b3fff2';ctx.beginPath();ctx.arc(x,y,2,0,7);ctx.fill()}
+   text(ctx,api.locale('TAP SECTOR → THROW','IZVĒLIES SEKTORU → MEST'),260,20,13,'#c5faec')
    if(locked){ctx.fillStyle='#070d19b8';ctx.fillRect(0,225,520,63);text(ctx,bust?api.locale('BUST','PĀRSNIEGTS!'):api.locale('Next visit…','Nākamais gājiens…'),260,265,22,'#fff')}
  }
  reset();const stop=loop(dt=>{elapsed+=dt;thrown.forEach(d=>d.age+=dt);if(locked){locked=Math.max(0,locked-dt);if(!locked&&!ended)nextVisit()}},draw);
