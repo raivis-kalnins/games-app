@@ -1,10 +1,11 @@
-/* Games 63 v2.3.0: offline and refresh-safe PWA caching. No tracking. */
-const CACHE_NAME='games63-offline-v2.3.0';
+/* Games 63 v2.4.1: offline and refresh-safe PWA caching. No tracking. */
+const CACHE_NAME='games63-offline-v2.4.1';
 const SHELL=[
  './','./index.php','./manifest.webmanifest',
  './assets/style.css','./assets/app.js','./assets/i18n.js','./assets/help.js',
  './assets/icon.svg','./assets/icon-180.png','./assets/icon-192.png','./assets/icon-512.png',
  './assets/vendor/react.production.min.js','./assets/vendor/react-dom.production.min.js',
+ ...['bg','cz','de','dk','ee','es','fi','fr','gb','gr','hr','hu','ie','is','it','lt','lv','mt','nl','no','pl','pt','ro','ru','se','si','sk','ua'].map(x=>'./assets/flags/'+x+'.png'),
  ...['wolf','formula','blocks','boats','moto','snooker','darts','farm','cards','chess','domino','zole','novuss','platform','tycoon','cirks'].map(x=>'./assets/art/'+x+'.svg'),
  ...['shared','legacy-adapter','wolf-retro','domino','zole','formula','blocks','venice','moto','snooker','darts','farm','cards','chess','novuss','platform','tycoon','cirks'].map(x=>'./games/'+x+'.js')
 ];

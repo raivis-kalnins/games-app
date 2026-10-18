@@ -181,3 +181,63 @@
 .game-modal .legacy-stage canvas{border-radius:12px;box-shadow:0 6px 28px #0003}
 @media (pointer:coarse) and (orientation:landscape) and (max-height:600px){.game-modal-body canvas{max-height:calc(100dvh - 138px)}.game-modal-body .orientation-note{display:none}}
 @media (max-width:360px){.header-inner{grid-template-columns:1fr;gap:7px}.header-tools{justify-content:space-between;width:100%}.lang-select{width:min(120px,30vw);max-width:none}.site-header .logo{justify-self:start}.hero h1{font-size:clamp(30px,8vw,35px)}}
+
+
+/* v2.4.0: align pool UI with the table, preserve Formula portrait play, add the app family. */
+.pool-stage{max-width:750px}
+.pool-table-title{width:min(100%,750px);margin:0 auto 9px;text-align:center;color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.13em;line-height:1.5}
+.pool-scoreboard.hud-inset{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;justify-content:initial;gap:10px;width:min(100%,750px);max-width:750px;margin:12px auto 0}
+.pool-scoreboard .pool-player{display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:normal;line-height:1.3;text-align:center;min-width:0;padding:8px 10px;max-width:100%}
+.pool-scoreboard .pool-player:first-child{justify-self:start}
+.pool-scoreboard .pool-player:last-child{justify-self:end}
+.pool-scoreboard .pool-turn{justify-self:center;text-align:center;min-width:0;font-size:12px;max-width:250px;overflow-wrap:anywhere}
+.pool-scoreboard .pool-turn,.pool-scoreboard .pool-player{order:initial}
+@media(max-width:580px){
+ .pool-scoreboard.hud-inset{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}
+ .pool-scoreboard .pool-player{width:100%;font-size:11px;padding:7px 5px}
+ .pool-scoreboard .pool-player:first-child{grid-column:1;grid-row:1}
+ .pool-scoreboard .pool-player:last-child{grid-column:2;grid-row:1}
+ .pool-scoreboard .pool-turn{grid-column:1/-1;grid-row:2;justify-self:center;width:100%;font-size:11px}
+ .pool-table-title{font-size:10px;letter-spacing:.09em}
+}
+/* Formula is already a portrait (480 x 620) game; no rotation shield. */
+@media (pointer:coarse) and (orientation:portrait){
+ .game-modal.formula-portrait .stage-wrap.stage-portrait{width:min(100%,55dvh,480px);max-width:480px;max-height:none}
+ .game-modal.formula-portrait .game-modal-body{overflow-y:auto}
+ .game-modal.formula-portrait .stage-wrap.stage-portrait canvas{width:100%;max-height:none;height:auto}
+ .game-modal.formula-portrait .hud-inset{justify-content:space-between;font-size:11px;gap:6px}
+ .game-modal.formula-portrait .control-bar{margin-top:8px}
+}
+/* Like GO 63, show the other services but not a link back to the current app. */
+.other-apps-wrap{max-width:1340px;margin:0 auto 28px;padding:26px clamp(16px,3.1vw,42px);background:#091c22;color:#f5fffd;border:1px solid #2b4a50;border-radius:24px}
+.other-apps-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.other-apps-head h2{margin:0;font-size:clamp(19px,2.4vw,25px);line-height:1.25;letter-spacing:-.025em}
+.other-apps-head p{margin:0;color:#b5d0d1;font-size:13px}
+.other-apps-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.other-app-link{display:flex;align-items:center;gap:10px;min-width:0;min-height:66px;padding:11px;border:1px solid #29454b;background:#11282e;color:#fff;text-decoration:none;border-radius:13px;transition:background .18s,border-color .18s,transform .18s}
+.other-app-link:hover{background:#19353c;border-color:#6de5d8;transform:translateY(-2px)}
+.other-app-icon{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:10px;background:color-mix(in srgb,var(--app-colour),transparent 81%);color:var(--app-colour);font-size:20px}
+.other-app-info{min-width:0;display:flex;flex-direction:column;gap:3px;line-height:1.3}
+.other-app-info strong{font-weight:800;font-size:13px}
+.other-app-info small{font-size:11px;color:#bbd0d2;white-space:normal}
+.other-app-arrow{margin-left:auto;padding-left:5px;color:#63ead4;font-size:18px;flex:0 0 auto}
+@media(max-width:1040px){.other-apps-wrap{margin-left:16px;margin-right:16px}.other-apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.other-apps-wrap{padding:20px 14px;border-radius:18px;margin:0 12px 24px}.other-apps-grid{grid-template-columns:1fr;gap:8px}.other-app-link{min-height:58px;padding:9px}.other-apps-head{gap:4px}.other-apps-head p{font-size:12px}}
+
+/* v2.4.1: accessible offline flag picker with a scrollable language menu. */
+.lang-picker{position:relative;display:block;flex:0 1 auto;min-width:0}
+.lang-toggle{width:166px;max-width:25vw;height:40px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--txt);font-size:12px;font-weight:750;text-align:left;white-space:nowrap}
+.lang-toggle:hover,.lang-toggle[aria-expanded=true]{border-color:var(--teal);background:var(--panel2)}
+.lang-flag{display:block;flex:none;width:26px;height:20px;object-fit:contain;filter:drop-shadow(0 1px 1px #0004)}
+.lang-current-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lang-caret{flex:none;line-height:1;margin-left:auto;color:var(--muted);font-size:18px;transform:translateY(-2px)}
+.lang-toggle[aria-expanded=true] .lang-caret{transform:translateY(2px) rotate(180deg)}
+.lang-options{position:absolute;right:0;top:calc(100% + 8px);z-index:65;display:grid;gap:2px;width:250px;max-height:min(64vh,410px);max-height:min(64dvh,410px);overflow-y:auto;overscroll-behavior:contain;padding:6px;border:1px solid var(--line);border-radius:15px;background:var(--panel);box-shadow:0 24px 65px #0007;scrollbar-width:thin}
+.lang-choice{display:flex;gap:11px;align-items:center;min-height:40px;width:100%;padding:7px 11px;color:var(--txt);background:transparent;border:1px solid transparent;border-radius:9px;font-size:13px;font-weight:650;text-align:left}
+.lang-choice:hover,.lang-choice:focus-visible,.lang-choice.is-selected{background:var(--panel2)}
+.lang-choice.is-selected{border-color:color-mix(in srgb,var(--teal),transparent 40%)}
+.lang-selected-icon{margin-left:auto;color:var(--teal);font-weight:900}
+@media(max-width:760px){.lang-toggle{width:132px;max-width:36vw}}
+@media(max-width:540px){.lang-toggle{height:35px;width:107px;max-width:27vw;padding:0 6px;gap:5px;border-radius:10px;font-size:11px}.lang-flag{width:22px;height:17px}.lang-caret{font-size:14px}.lang-options{position:fixed;top:62px;left:12px;right:12px;width:auto;max-height:min(65vh,460px);max-height:min(65dvh,460px);padding:8px;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.lang-choice{font-size:12px;min-width:0;gap:7px;padding:7px}.lang-choice>span:not(.lang-selected-icon){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media(max-width:380px){.lang-toggle{width:79px;max-width:24vw;gap:3px;padding:0 4px}.lang-options{left:7px;right:7px;top:60px}}
+@media(max-width:360px){.lang-options{top:105px}}

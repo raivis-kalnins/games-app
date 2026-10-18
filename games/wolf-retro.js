@@ -2,11 +2,13 @@
  * aligned basket; missed eggs fall and break. Progressive 12-level speed. */
 window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
   const W=800,H=540;
+  // Keep both lower rails, egg destinations and basket sockets at the same height.
+  // One shared coordinate set avoids a mobile-vs-desktop visual mismatch.
   const lanes=[
     {sx:172,sy:160,ex:325,ey:227,side:-1,upper:true},
     {sx:628,sy:160,ex:475,ey:227,side:1,upper:true},
-    {sx:172,sy:337,ex:336,ey:362,side:-1,upper:false},
-    {sx:628,sy:337,ex:464,ey:362,side:1,upper:false}
+    {sx:172,sy:304,ex:336,ey:328,side:-1,upper:false},
+    {sx:628,sy:304,ex:464,ey:328,side:1,upper:false}
   ];
   let position=0,mode='A',running=true,misses=0,eggs=[],splats=[],caught=[],spawnLeft=.6,elapsed=0,level=1,score=0;
   let basket={x:349,y:227},wiggle=0,celebrate=0;
@@ -124,7 +126,7 @@ window.G63Wolf = function({g,ctx:c,btn,points,show,t}) {
       c.restore()}
     if(celebrate>.3){txt('✦ +1 ✦',400,171,18,'#538167')}
     if(!running||g.over){fill('#e6f1d6dc');c.beginPath();c.roundRect(265,206,270,102,14);c.fill();txt(g.over?t('gameOver'):t('paused'),400,244,30,'#30483c','system-ui');txt(g.over?t('restart'):t('resume'),400,278,15,'#49685a')}
-    for(let i=0;i<4;i++){const x=211+i*126;txt(String(i+1),x-16,507,18,'#625e53','monospace');const dx=i%2?1:-1,dy=i<2?-1:1;path([[x+5,505],[x+19*dx,505+11*dy]],'#6e6b60',3);path([[x+19*dx,505+11*dy],[x+19*dx-7*dx,505+11*dy]],'#6e6b60',2);path([[x+19*dx,505+11*dy],[x+19*dx,505+11*dy-7*dy]],'#6e6b60',2)}
+    // Controls are below the console; do not duplicate them in the narrow bezel.
   }
   g.draw=draw;start();g.localize();return g;
 };

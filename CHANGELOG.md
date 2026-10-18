@@ -1,3 +1,25 @@
+## v2.4.1 — language flags and Wolf console polish (18 October 2026)
+
+- Replaced the native language selector with a responsive, keyboard-friendly flag picker for all 28 existing UI languages. English (UK) remains the default on new devices.
+- Flags are locally bundled PNG assets; they render consistently on Windows, Android and iOS, including offline mode. The flags are graphical assets, not font files.
+- Updated service worker's precache and bumped cache/version references to ensure new assets reach users.
+- Removed duplicate position numbers/arrows drawn in the bottom bezel of Wolf & Eggs; the functional controls below the console remain in place.
+- Preserved existing game engines and score/favourites storage keys.
+
+# Games 63 v2.4.0 - targeted layout and app links update
+
+- Pool: moved the canvas label to a centred accessible heading above the table, aligned three score elements to the same table width, and prevented overlaps on narrow screens.
+- Formula Sprint: portrait-first gameplay on phones; removed the unnecessary rotation requirement, and constrained canvas height inside the mobile game modal.
+- Wolf & Eggs: lifted both lower rails and their basket/egg endpoints by 33-34 canvas units, keeping catches and drawing aligned on every viewport.
+- Added related 63.lv apps panel: Radio, Translate, GO, Price, Book, Whiteboard, AI, and Language; Games 63 is intentionally omitted as the current site.
+- PWA cache version and static asset query strings updated to v2.4.0.
+- All other 16 game modules, stored favourites, preferences and scores remain unchanged.
+
+## Install
+Back up site files. Extract the changed-files ZIP into the games.63.lv document root, overwriting matching files while keeping the same paths. cPanel should use mode 0644 for files and 0755 for directories. Refresh the PWA/cache after the upload.
+
+---
+
 # Games 63 changelog
 
 ## 2.3.0 (2026-10-17)

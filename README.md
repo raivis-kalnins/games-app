@@ -1,15 +1,24 @@
-# Games 63 — v2.3.0 cPanel release
+# Games 63 — v2.4.0 cPanel release
 
-Latest production package for **https://games.63.lv/**. This is an update to the 16-game v2.2.0 release. It runs on standard cPanel PHP hosting (no Node.js build required on the server), using bundled React for the interface and standalone Canvas games. This release still uses the existing local React 16 runtime; it does **not** upgrade to React 19/Vite.
+Latest cPanel package for **https://games.63.lv/**. This is a targeted update to the 16-game v2.3.0 release. It runs on standard cPanel PHP hosting (no Node.js build required on the server), using bundled React for the interface and standalone Canvas games. This release still uses the existing local React 16 runtime; it does **not** upgrade to React 19/Vite.
 
 ## Install / upgrade (recommended)
 
 1. In cPanel > File Manager, open the **document root for games.63.lv**; do not assume it is the account's main public_html directory.
 2. In File Manager Settings, enable **Show Hidden Files** and back up the current `.htaccess` and site files.
-3. Extract **games63-v2.3.0-changed-files.zip** directly over the existing v2.2.0 installation, preserving folder paths (`assets/`, `games/`). If installing a fresh site, extract **games63-cpanel-v2.3.0-full.zip** instead.
+3. Extract **games63-v2.4.0-changed-files-only.zip** directly over the existing v2.3.0 installation, preserving folder paths (`assets/`, `games/`). If installing a fresh site, extract **games63-cpanel-v2.4.0-full.zip** instead.
 4. Use cPanel permissions **0644** for files and **0755** for directories. Never apply `0777`.
 5. Open https://games.63.lv/, then use the new header **⟳** button to clear the Games 63 PWA cache and reload. This clears offline game files but deliberately does not erase saved favourites or high scores.
 6. For a test, open Wolf & Eggs on a phone: a portrait orientation prompt appears; rotate to landscape or use the manual portrait override. Close **×** to return to the catalog.
+
+## v2.4.0 changes
+
+- **8-ball pool:** centred table title above the canvas and aligned the two player scores and turn indicator to the same 750px table width, with a compact two-row scoreboard on phones.
+- **Formula Sprint:** displays vertically by default on mobile, with canvas dimensions fitted to available portrait height; it no longer requests device rotation.
+- **Wolf & Eggs:** both lower perches and their shared egg/basket endpoints are raised together on all screen sizes.
+- **Other apps:** added an eight-item 63.lv family panel like GO 63: Radio, Translate, GO, Price, Book, Whiteboard, AI and Language. Games 63 is excluded because this is the current site. Links open in a new tab.
+- **Cache:** bump service worker cache to v2.4.0 and URL query versions for changed static assets.
+- No databases, build steps or additional dependencies. No game saves or settings are intentionally cleared.
 
 ## v2.3.0 changes
 
@@ -149,3 +158,9 @@ This release has 16 original/offline-friendly browser mini-games:
 **Controls:** Touch/mouse supported for every game. Open the Help button in each game for instructions in English, Latvian or Russian. On mobile the Install button displays only `Install` / `Instalēt` / `Установить` as appropriate. Sounds are muted by default, with the toggle in the header. The PWA service worker caches game files after installation.
 
 **Scope/limitations:** 8-ball pool uses two local players taking turns, not a network multiplayer server. Novuss and City Tycoon are playable simplified adaptations and do not implement every official competition rule. The platform game has original art, physics and characters; no Nintendo assets. UI translations: the original 28 language choices remain, with complete new game guides for EN/LV/RU; other game guides fall back to English. React remains the existing locally bundled v16 runtime; canvas animation runs separately. Browser-level interaction should be tested on the target mobile and desktop devices after upload.
+
+### v2.4.1 flag selector
+
+The header has an accessible flag-and-language dropdown with local PNG flag images for all 28 available languages. Clicking the selected language opens the selector; use Arrow Up/Down, Home, End, Enter or Escape on keyboard. Use the language label rather than the flag as the source of truth (e.g. UK flag for English (UK)). Language preferences and local best scores remain unchanged by an upgrade.
+
+The Wolf & Eggs frame no longer duplicates the four position labels; use the controls immediately below the game screen or keys 1–4.

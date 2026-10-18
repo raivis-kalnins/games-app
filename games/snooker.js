@@ -15,7 +15,10 @@ export function poolRack(){
 export function mountGame(root,api){
  root.replaceChildren();const ac=new AbortController(),signal=ac.signal;
  const {wrapper,canvas,ctx,point}=canvasStage(root,720,425,'stage-wide pool-stage');
+ const title=document.createElement('div');title.className='pool-table-title';
+ title.textContent=api.locale('8-BALL POOL · TWO PLAYERS','8-BALL BILJARDS · DIVI SPĒLĒTĀJI');root.insertBefore(title,wrapper);
  const info=hud(root,'<span class="pool-player" data-pool-p1>🔵 '+api.locale('Player 1','Spēlētājs 1')+' <b data-p1>0</b>/7</span><span class="pool-turn" data-turn>🎱 '+api.locale('Break','Sākums')+'</span><span class="pool-player" data-pool-p2>🟠 '+api.locale('Player 2','Spēlētājs 2')+' <b data-p2>0</b>/7</span>');
+ info.classList.add('pool-scoreboard');
  const message=status(root,'');message.setAttribute('aria-live','polite');
  const state={balls:[],turn:0,assigned:null,drag:null,shot:false,potted:[],scratch:false,firstTouch:null,ended:false,prev:0,everShot:false};
  const names=()=>[api.locale('Player 1','Spēlētājs 1'),api.locale('Player 2','Spēlētājs 2')];
@@ -79,7 +82,8 @@ export function mountGame(root,api){
    for(const [x,y] of POCKETS){ctx.fillStyle='#101b23';ctx.beginPath();ctx.arc(x,y,23,0,7);ctx.fill();ctx.strokeStyle='#e5c891';ctx.lineWidth=4;ctx.stroke()}
    for(const b of state.balls)drawBall(b);
    const b=cue();if(state.drag&&b){const dx=b.x-state.drag.x,dy=b.y-state.drag.y,len=Math.hypot(dx,dy);if(len>1){const nx=dx/len,ny=dy/len;ctx.strokeStyle='#fff5c1';ctx.setLineDash([6,8]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x+nx*195,b.y+ny*195);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#dbc18a';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(b.x-nx*16,b.y-ny*16);ctx.lineTo(b.x-nx*(40+len*.7),b.y-ny*(40+len*.7));ctx.stroke()}}
-   text(ctx,'GAMES 63 • 8-BALL POOL',193,17,12,'#f7e9d2');}
+   // Table legend is positioned in DOM above the canvas; no text near the pockets.
+ }
  reset();const stop=loop(step,draw);
  return()=>{stop();ac.abort()};
 }

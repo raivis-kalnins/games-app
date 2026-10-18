@@ -33,20 +33,20 @@ header('Cache-Control: no-cache, max-age=0, must-revalidate');
   <meta property="og:site_name" content="Games 63">
   <meta property="og:title" content="Games 63 — Free browser games">
   <meta property="og:description" content="16 free browser mini-games, mobile ready, play instantly.">
-  <link rel="manifest" href="./manifest.webmanifest?v=2.3.0">
+  <link rel="manifest" href="./manifest.webmanifest?v=2.4.1">
   <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
   <link rel="apple-touch-icon" href="./assets/icon-180.png" sizes="180x180">
-  <link rel="preload" href="./assets/style.css?v=2.3.0" as="style">
-  <link rel="stylesheet" href="./assets/style.css?v=2.3.0">
+  <link rel="preload" href="./assets/style.css?v=2.4.1" as="style">
+  <link rel="stylesheet" href="./assets/style.css?v=2.4.1">
   <title>Games 63 — Play free browser games</title>
 </head>
 <body>
  <div id="app"><div class="boot-loading">✦ Loading Games 63…</div></div>
  <noscript><section style="padding:22px;max-width:760px;margin:auto;font:16px system-ui"><h1>Games 63 — 16 free browser games</h1><p>Play Wolf &amp; Eggs, Formula Sprint, Block Stack, Venice Boats, Moto Rider, 8-Ball Pool, Darts 301, Farm City, Durak, Chess, Domino, Zole, Novuss, Star Hopper, City Tycoon and Snakes &amp; Ladders on mobile or desktop. JavaScript must be enabled to play.</p></section></noscript>
  <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Games 63 — Free Browser Games","description":"16 free browser mini-games for desktop, tablets and phones.","url":"https://games.63.lv/","inLanguage":["en-GB","lv","ru"],"mainEntity":{"@type":"ItemList","numberOfItems":16,"itemListElement":[{"@type":"ListItem","position":1,"name":"Wolf & Eggs","url":"https://games.63.lv/#game/wolf"},{"@type":"ListItem","position":2,"name":"Formula Sprint","url":"https://games.63.lv/#game/formula"},{"@type":"ListItem","position":3,"name":"Block Stack","url":"https://games.63.lv/#game/blocks"},{"@type":"ListItem","position":4,"name":"Venice Boats","url":"https://games.63.lv/#game/venice"},{"@type":"ListItem","position":5,"name":"Moto Rider","url":"https://games.63.lv/#game/moto"},{"@type":"ListItem","position":6,"name":"8-Ball Pool","url":"https://games.63.lv/#game/snooker"},{"@type":"ListItem","position":7,"name":"Darts 301","url":"https://games.63.lv/#game/darts"},{"@type":"ListItem","position":8,"name":"Farm City","url":"https://games.63.lv/#game/farm"},{"@type":"ListItem","position":9,"name":"Durak Cards","url":"https://games.63.lv/#game/cards"},{"@type":"ListItem","position":10,"name":"Chess","url":"https://games.63.lv/#game/chess"},{"@type":"ListItem","position":11,"name":"Domino","url":"https://games.63.lv/#game/domino"},{"@type":"ListItem","position":12,"name":"Zole","url":"https://games.63.lv/#game/zole"},{"@type":"ListItem","position":13,"name":"Novuss","url":"https://games.63.lv/#game/novuss"},{"@type":"ListItem","position":14,"name":"Star Hopper","url":"https://games.63.lv/#game/platform"},{"@type":"ListItem","position":15,"name":"City Tycoon","url":"https://games.63.lv/#game/tycoon"},{"@type":"ListItem","position":16,"name":"Snakes & Ladders","url":"https://games.63.lv/#game/cirks"}]}}</script>
- <script defer src="./assets/vendor/react.production.min.js?v=2.3.0"></script>
- <script defer src="./assets/vendor/react-dom.production.min.js?v=2.3.0"></script>
- <script type="module" src="./assets/app.js?v=2.3.0"></script>
+ <script defer src="./assets/vendor/react.production.min.js?v=2.4.1"></script>
+ <script defer src="./assets/vendor/react-dom.production.min.js?v=2.4.1"></script>
+ <script type="module" src="./assets/app.js?v=2.4.1"></script>
 </body>
 </html>
