@@ -39,6 +39,67 @@ header('Cache-Control: no-cache, max-age=0, must-revalidate');
   <link rel="apple-touch-icon" href="./assets/icon-180.png" sizes="180x180">
   <link rel="preload" href="./assets/style.css?v=2.4.1" as="style">
   <link rel="stylesheet" href="./assets/style.css?v=2.4.1">
+  <style>
+    /* Keep the language flag, label and chevron aligned on desktop and mobile. */
+    .lang-toggle {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) 16px;
+      align-items: center;
+      column-gap: 8px;
+    }
+    .lang-toggle .lang-flag {
+      align-self: center;
+      justify-self: center;
+    }
+    .lang-toggle .lang-current-name {
+      display: block;
+      align-self: center;
+      line-height: 1.25;
+    }
+    .lang-toggle .lang-caret,
+    .lang-toggle[aria-expanded="true"] .lang-caret {
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      justify-self: end;
+      align-self: center;
+      font-size: 0;
+      line-height: 0;
+      transform: none;
+    }
+    .lang-toggle .lang-caret::after {
+      content: "";
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-right: 1.75px solid currentColor;
+      border-bottom: 1.75px solid currentColor;
+      transform: translateY(-1px) rotate(45deg);
+      transition: transform 160ms ease;
+    }
+    .lang-toggle[aria-expanded="true"] .lang-caret::after {
+      transform: translateY(1px) rotate(225deg);
+    }
+    @media (max-width: 540px) {
+      .lang-toggle {
+        grid-template-columns: 22px minmax(0, 1fr) 14px;
+        column-gap: 5px;
+      }
+      .lang-toggle .lang-caret,
+      .lang-toggle[aria-expanded="true"] .lang-caret {
+        width: 14px;
+        height: 14px;
+      }
+    }
+    @media (max-width: 380px) {
+      .lang-toggle { column-gap: 3px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lang-toggle .lang-caret::after { transition: none; }
+    }
+  </style>
   <title>Games 63 — Play free browser games</title>
 </head>
 <body>
